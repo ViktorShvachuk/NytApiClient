@@ -84,12 +84,17 @@ readonly class NytClient
             ?? $response->json('message')
             ?? 'NYT API request failed.';
 
-        Log::error('NYT API error', [
-            'status' => $response->status(),
-            'url' => $response->effectiveUri()?->__toString(),
-            'message' => $message,
-            'response' => $response->json(),
-        ]);
+        if (!app()->runningUnitTests()) {
+            $url = $response->effectiveUri()?->__toString();
+            $maskedUrl = $url ? preg_replace('/api-key=[^&]+/', 'api-key=******', $url) : null;
+
+            Log::error('NYT API error', [
+                'status' => $response->status(),
+                'url' => $maskedUrl,
+                'message' => $message,
+                'response' => $response->json(),
+            ]);
+        }
 
         throw new NytApiException(
             $message,
