@@ -23,14 +23,18 @@ class NytClientTest extends TestCase
         Http::fake([
             'api.nytimes.com/*' => Http::response([
                 'results' => [
-                    [
-                        'title' => 'TEST BOOK',
-                        'description' => 'A very good book',
-                        'contributor' => 'By Junie',
-                        'author' => 'Junie',
-                        'publisher' => 'JetBrains',
-                        'primary_isbn13' => '1234567890123',
-                        'primary_isbn10' => '1234567890',
+                    'lists' => [
+                        [
+                            'books' => [
+                                [
+                                    'title' => 'TEST BOOK',
+                                    'description' => 'A very good book',
+                                    'author' => 'Junie',
+                                    'publisher' => 'JetBrains',
+                                    'primary_isbn13' => '1234567890123',
+                                ]
+                            ]
+                        ]
                     ]
                 ]
             ], 200)
@@ -45,7 +49,7 @@ class NytClientTest extends TestCase
         $this->assertEquals('Junie', $results->first()->author);
 
         Http::assertSent(function ($request) {
-            return $request->url() === 'https://api.nytimes.com/svc/books/v3/lists/best-sellers/history.json?api-key=test-api-key';
+            return $request->url() === 'https://api.nytimes.com/svc/books/v3/lists/overview.json?api-key=test-api-key';
         });
     }
 

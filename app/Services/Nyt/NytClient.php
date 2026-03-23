@@ -27,13 +27,17 @@ readonly class NytClient
     {
         $response = Http::baseUrl($this->baseUrl)
             ->withQueryParameters(array_merge($params, ['api-key' => $this->apiKey]))
-            ->get('lists/best-sellers/history.json');
+            ->get('lists/overview.json');
 
         if ($response->failed()) {
             $this->handleError($response);
         }
 
-        return collect($response->json('results', []))
+        $results = $response->json('results', []);
+        $lists = $results['lists'] ?? [];
+
+        return collect($lists)
+            ->flatMap(fn (array $list) => $list['books'] ?? [])
             ->map(fn (array $data) => BestSellerResult::fromArray($data));
     }
 

@@ -7,13 +7,14 @@ readonly class BestSellerResult
     public function __construct(
         public string $title,
         public string $description,
-        public string $contributor,
         public string $author,
         public string $publisher,
         public string $primaryIsbn13,
-        public string $primaryIsbn10,
-        public array $ranksHistory = [],
-        public array $reviews = [],
+        public string $contributor = '',
+        public string $bookImage = '',
+        public string $amazonProductUrl = '',
+        public int $rank = 0,
+        public int $weeksOnList = 0,
     ) {}
 
     public static function fromArray(array $data): self
@@ -21,13 +22,14 @@ readonly class BestSellerResult
         return new self(
             title: $data['title'] ?? '',
             description: $data['description'] ?? '',
-            contributor: $data['contributor'] ?? '',
             author: $data['author'] ?? '',
             publisher: $data['publisher'] ?? '',
             primaryIsbn13: $data['primary_isbn13'] ?? '',
-            primaryIsbn10: $data['primary_isbn10'] ?? '',
-            ranksHistory: $data['ranks_history'] ?? [],
-            reviews: $data['reviews'] ?? [],
+            contributor: $data['contributor'] ?? '',
+            bookImage: $data['book_image'] ?? '',
+            amazonProductUrl: $data['amazon_product_url'] ?? '',
+            rank: $data['rank'] ?? 0,
+            weeksOnList: $data['weeks_on_list'] ?? 0,
         );
     }
 }
