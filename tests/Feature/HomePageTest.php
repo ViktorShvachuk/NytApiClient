@@ -18,8 +18,11 @@ class HomePageTest extends TestCase
         Http::fake([
             'api.nytimes.com/*' => Http::response([
                 'results' => [
+                    'published_date' => '2026-03-23',
                     'lists' => [
                         [
+                            'display_name' => 'Fiction List',
+                            'list_name_encoded' => 'fiction-list',
                             'books' => [
                                 [
                                     'title' => 'FEATURED BOOK',
@@ -38,7 +41,8 @@ class HomePageTest extends TestCase
         $response = $this->get('/');
 
         $response->assertStatus(200);
-        $response->assertSee('NYT Best Sellers - 23.03.2026');
+        $response->assertSee('NYT Best Sellers - 2026-03-23');
+        $response->assertSee('Fiction List');
         $response->assertSee('FEATURED BOOK');
         $response->assertSee('Author Name');
         $response->assertSee('A featured description');
@@ -48,7 +52,9 @@ class HomePageTest extends TestCase
     {
         Http::fake([
             'api.nytimes.com/*' => Http::response([
-                'results' => []
+                'results' => [
+                    'lists' => []
+                ]
             ], 200)
         ]);
 

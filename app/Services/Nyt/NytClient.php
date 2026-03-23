@@ -4,6 +4,8 @@ namespace App\Services\Nyt;
 
 use App\Exceptions\NytApiException;
 use App\Services\Nyt\DataObjects\BestSellerResult;
+use App\Services\Nyt\DataObjects\NytListDetail;
+use App\Services\Nyt\DataObjects\NytOverview;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
@@ -17,14 +19,19 @@ readonly class NytClient
     ) {}
 
     /**
-     * Get Best Sellers History.
+     * Get Best Sellers Overview.
      *
-     * @param array $params
-     * @return Collection<int, BestSellerResult>
+     * @param string|null $publishedDate
+     * @return NytOverview
      * @throws NytApiException|ConnectionException
      */
-    public function getBestSellers(array $params = []): Collection
+    public function getOverview(?string $publishedDate = null): NytOverview
     {
+        $params = [];
+        if ($publishedDate) {
+            $params['published_date'] = $publishedDate;
+        }
+
         $response = Http::baseUrl($this->baseUrl)
             ->withQueryParameters(array_merge($params, ['api-key' => $this->apiKey]))
             ->get('lists/overview.json');
@@ -33,12 +40,28 @@ readonly class NytClient
             $this->handleError($response);
         }
 
-        $results = $response->json('results', []);
-        $lists = $results['lists'] ?? [];
+        return NytOverview::fromArray($response->json('results', []));
+    }
 
-        return collect($lists)
-            ->flatMap(fn (array $list) => $list['books'] ?? [])
-            ->map(fn (array $data) => BestSellerResult::fromArray($data));
+    /**
+     * Get Best Sellers List.
+     *
+     * @param string $list
+     * @param string|null $date
+     * @return NytListDetail
+     * @throws NytApiException|ConnectionException
+     */
+    public function getList(string $list, ?string $date = 'current'): NytListDetail
+    {
+        $response = Http::baseUrl($this->baseUrl)
+            ->withQueryParameters(['api-key' => $this->apiKey])
+            ->get("lists/{$date}/{$list}.json");
+
+        if ($response->failed()) {
+            $this->handleError($response);
+        }
+
+        return NytListDetail::fromArray($response->json('results', []));
     }
 
     /**

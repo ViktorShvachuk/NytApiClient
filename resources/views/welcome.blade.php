@@ -52,52 +52,63 @@
         <div class="flex items-center justify-center w-full transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0">
             <main class="flex max-w-[335px] w-full flex-col-reverse lg:max-w-4xl lg:flex-row">
                 <div class="text-[13px] leading-[20px] flex-1 p-6 pb-6 lg:p-20 lg:pb-10 bg-[#f9f9f8] dark:bg-[#161615] dark:text-[#EDEDEC] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d] rounded-bl-lg rounded-br-lg lg:rounded-tl-lg lg:rounded-br-none">
-                    <h1 class="mb-1 font-medium">NYT Best Sellers - 23.03.2026</h1>
+                    <h1 class="mb-1 font-medium">NYT Best Sellers - {{ $overview->publishedDate ?: '23.03.2026' }}</h1>
                     <p class="mb-4 text-[#706f6c] dark:text-[#A1A09A]">Najgorętsze tytuły z listy bestsellerów New York Times.</p>
 
-                    <div class="grid grid-cols-1 gap-8">
-                        @foreach($books as $book)
-                            <div class="p-6 bg-white dark:bg-[#1b1b18] rounded-xl shadow-sm border border-[#e3e3e0] dark:border-[#3E3E3A]">
-                                <h3 class="font-bold text-xl text-[#f53003] dark:text-[#FF4433] mb-3">{{ $book->title }}</h3>
-                                <div class="flex flex-col sm:flex-row gap-6">
-                                    @if($book->bookImage)
-                                        <div class="shrink-0 mx-auto sm:mx-0">
-                                            <img src="{{ $book->bookImage }}" alt="{{ $book->title }}" class="w-32 h-48 object-cover rounded-lg shadow-md">
-                                        </div>
-                                    @endif
-                                    <div class="flex-1">
-                                        <p class="text-base italic mb-3">by {{ $book->author }}</p>
-                                        <p class="text-sm text-[#706f6c] dark:text-[#A1A09A] line-clamp-4 mb-4 leading-relaxed">{{ $book->description }}</p>
-
-                                        <div class="mt-auto pt-4 border-t border-[#e3e3e0] dark:border-[#3E3E3A] flex flex-col gap-2 text-xs text-gray-600 dark:text-[#A1A09A]">
-                                            <div class="">
-                                                <span class="flex items-center">
-                                                    <strong class="mr-1">Publisher:</strong> {{ $book->publisher }}
-                                                </span>
-                                                <span class="flex items-center">
-                                                    <strong class="mr-1">ISBN:</strong> {{ $book->primaryIsbn13 }}
-                                                </span>
-                                                @if($book->rank)
-                                                    <span class="flex items-center font-bold text-[#f53003] dark:text-[#FF4433]">
-                                                        Rank: #{{ $book->rank }}
-                                                    </span>
+                    <div class="space-y-12">
+                        @foreach($overview->lists as $list)
+                            <div class="border-b border-gray-200 dark:border-gray-800 pb-8 last:border-0">
+                                <h2 class="text-lg font-bold mb-6 text-gray-800 dark:text-gray-200 uppercase tracking-wider border-l-4 border-[#f53003] pl-4">
+                                    <a href="{{ route('list.show', $list->listNameEncoded) }}" class="hover:text-[#f53003] transition-colors">
+                                        {{ $list->displayName }} &rarr;
+                                    </a>
+                                </h2>
+                                <div class="grid grid-cols-1 gap-8">
+                                    @foreach($list->books as $book)
+                                        <div class="p-6 bg-white dark:bg-[#1b1b18] rounded-xl shadow-sm border border-[#e3e3e0] dark:border-[#3E3E3A]">
+                                            <h3 class="font-bold text-xl text-[#f53003] dark:text-[#FF4433] mb-3">{{ $book->title }}</h3>
+                                            <div class="flex flex-col sm:flex-row gap-6">
+                                                @if($book->bookImage)
+                                                    <div class="shrink-0 mx-auto sm:mx-0">
+                                                        <img src="{{ $book->bookImage }}" alt="{{ $book->title }}" class="w-32 h-48 object-cover rounded-lg shadow-md">
+                                                    </div>
                                                 @endif
-                                            </div>
-                                            @if($book->amazonProductUrl)
-                                                <div class="mt-1">
-                                                    <a href="{{ $book->amazonProductUrl }}" target="_blank" class="inline-flex items-center px-3 py-1 bg-[#f53003] dark:bg-[#FF4433] text-white rounded hover:bg-[#d42a02] transition-colors font-medium">
-                                                        Buy on Amazon
-                                                    </a>
+                                                <div class="flex-1">
+                                                    <p class="text-base italic mb-3">by {{ $book->author }}</p>
+                                                    <p class="text-sm text-[#706f6c] dark:text-[#A1A09A] line-clamp-4 mb-4 leading-relaxed">{{ $book->description }}</p>
+
+                                                    <div class="mt-auto pt-4 border-t border-[#e3e3e0] dark:border-[#3E3E3A] flex flex-col gap-2 text-xs text-gray-600 dark:text-[#A1A09A]">
+                                                        <div class="">
+                                                            <span class="flex items-center">
+                                                                <strong class="mr-1">Publisher:</strong> {{ $book->publisher }}
+                                                            </span>
+                                                            <span class="flex items-center">
+                                                                <strong class="mr-1">ISBN:</strong> {{ $book->primaryIsbn13 }}
+                                                            </span>
+                                                            @if($book->rank)
+                                                                <span class="flex items-center font-bold text-[#f53003] dark:text-[#FF4433]">
+                                                                    Rank: #{{ $book->rank }}
+                                                                </span>
+                                                            @endif
+                                                        </div>
+                                                        @if($book->amazonProductUrl)
+                                                            <div class="mt-1">
+                                                                <a href="{{ $book->amazonProductUrl }}" target="_blank" class="inline-flex items-center px-3 py-1 bg-[#f53003] dark:bg-[#FF4433] text-white rounded hover:bg-[#d42a02] transition-colors font-medium">
+                                                                    Buy on Amazon
+                                                                </a>
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                 </div>
-                                            @endif
+                                            </div>
                                         </div>
-                                    </div>
+                                    @endforeach
                                 </div>
                             </div>
                         @endforeach
                     </div>
 
-                    @if($books->isEmpty())
+                    @if($overview->lists->isEmpty())
                         <p class="text-center py-10 text-[#706f6c]">Brak wyników dla wybranej daty.</p>
                     @endif
                     <ul class="flex gap-3 text-sm leading-normal">
